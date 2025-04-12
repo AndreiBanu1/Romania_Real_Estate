@@ -1,0 +1,123 @@
+1️⃣ Install & Configure Jenkins
+If you haven't installed Jenkins yet, follow these steps:
+
+        Windows (Run Locally)
+        Download Jenkins from Jenkins official site.
+        Install it and launch Jenkins.war or install as a Windows service.
+        Open http://localhost:8080 in your browser.
+        Follow the setup wizard and install recommended plugins.
+        Linux (Ubuntu/Debian)
+        bash
+        Copy
+        Edit
+        sudo apt update
+        sudo apt install openjdk-11-jre
+        wget -q -O - https://pkg.jenkins.io/debian-stable/jenkins.io.key | sudo tee /usr/share/keyrings/jenkins-keyring.asc
+        echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/" | sudo tee /etc/apt/sources.list.d/jenkins.list > /dev/null
+        sudo apt update
+        sudo apt install jenkins
+        sudo systemctl start jenkins
+        sudo systemctl enable jenkins
+        Then access Jenkins on http://localhost:8080.
+
+2️⃣ Install Python & Plugins in Jenkins
+To allow Jenkins to run Python scripts:
+
+        Install the "Python Plugin" (Manage Jenkins > Manage Plugins > Available Plugins)
+        Install Pipeline Plugin if using scripted pipelines.
+        Verify Python installation:
+        Go to Manage Jenkins > Global Tool Configuration
+        Under Python, add the Python installation path (e.g., /usr/bin/python3 or C:\Python311\python.exe).
+        Ensure pip install -r requirements.txt runs successfully.
+
+3️⃣ Create a Jenkins Job for the Storia Crawler
+    Option 1: Simple Freestyle Job
+    Go to Jenkins Dashboard > New Item > Freestyle Project
+    Name it Storia_Crawler and click OK
+    Under Build Steps, click Add build step > Execute shell (Linux/macOS) or Execute Windows batch command
+    Add this command:
+    sh
+    Copy
+    Edit
+    cd /path/to/your/project
+    python storia_crawler.py bucuresti
+    Replace /path/to/your/project with your actual project directory.
+    Change bucuresti to any city or make it a parameter.
+
+    Option 2: Use Jenkins Pipeline (More Flexible)
+    If you want to schedule different cities in Jenkins Pipeline:
+        Go to Jenkins Dashboard > New Item > Pipeline
+        Name it Storia_Crawler_Pipeline
+        In the Pipeline section, choose Pipeline Script and paste:
+        groovy
+        Copy
+        Edit
+        pipeline {
+            agent any
+            parameters {
+                string(name: 'CITY', defaultValue: 'bucuresti', description: 'Enter the city to crawl')
+            }
+            stages {
+                stage('Clone Repository') {
+                    steps {
+                        script {
+                            sh 'git pull origin main'  // Update latest code
+                        }
+                    }
+                }
+                stage('Install Dependencies') {
+                    steps {
+                        sh 'pip install -r requirements.txt'
+                    }
+                }
+                stage('Run Crawler') {
+                    steps {
+                        script {
+                            sh "python storia_crawler.py ${params.CITY}"
+                        }
+                    }
+                }
+            }
+        }
+        This allows you to run any city dynamically (CITY is a parameter).
+        You can trigger it with bucuresti, cluj, timis directly from Jenkins UI.
+
+4️⃣ Schedule Automatic Crawls (Optional)
+        To schedule crawls (e.g., every night at 2 AM):
+
+        Go to Build Triggers > Check Build periodically
+        Enter this cron syntax:
+        nginx
+        Copy
+        Edit
+        H 2 * * * 
+        This means:
+        Runs at 2 AM every day
+        H distributes load across different times if multiple jobs exist.
+
+5️⃣ Running Separate Jobs for Each City (Parallel Execution)
+            If you want separate jobs per city (e.g., python storia_crawler.py cluj runs as a different Jenkins job):
+
+            Create multiple Freestyle jobs with different python storia_crawler.py <city> commands.
+            Or, use a Multi-configuration Job (Matrix) to loop over a list of cities:
+            Add Axis for CITY and input values like:
+            nginx
+            Copy
+            Edit
+            bucuresti
+            cluj
+            timis
+            constanta
+            Use python storia_crawler.py $CITY in the build step.
+            ✅ Final Thoughts
+            For a simple approach, use a Freestyle Job with different commands for each city.
+            For flexibility, use a Pipeline to dynamically select cities.
+            For automation, schedule jobs with cron expressions.
+            🔹 Next Steps:
+
+            Do you want logs saved in Jenkins? (e.g., storia_log.txt)
+            Should Jenkins email results if a city crawl fails?
+            Do you need parallel execution for all cities?
+
+
+6. Think how to split up the crawler with priceMin and priceMax
