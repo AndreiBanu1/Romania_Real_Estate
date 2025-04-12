@@ -1,15 +1,20 @@
 import psycopg2
 import json
 import re
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 class Database:
     def __init__(self):
         self.connection = psycopg2.connect(
-            dbname="real_estate_db",
-            user="admin",
-            password="admin",
-            host="localhost",
-            port="5432"
+            dbname=os.getenv("DB_NAME", "real_estate_db"),
+            user=os.getenv("DB_USER", "admin"),
+            password=os.getenv("DB_PASSWORD", "admin"),
+            host=os.getenv("DB_HOST", "localhost"),
+            port=os.getenv("DB_PORT", "5432")
         )
         self.cursor = self.connection.cursor()
 
