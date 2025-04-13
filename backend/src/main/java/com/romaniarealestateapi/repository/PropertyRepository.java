@@ -11,9 +11,9 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
 
     List<Property> findByPriceLessThanEqual(Double price);
     
-    List<Property> findByPriceSQMLessThanEqual(Double priceSQM);
+    List<Property> findByPricePerSqmLessThanEqual(Double price);
 
-    List<Property> findByNoRooms(String noRoooms);
+    List<Property> findByRooms(String rooms);
 
     List<Property> findByAgencyId(Long agencyId);
 }
