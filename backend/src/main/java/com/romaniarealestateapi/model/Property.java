@@ -59,6 +59,10 @@ public class Property {
     @JoinColumn(name = "agency_id", referencedColumnName = "id")
     private Agency agency;
 
+    @ManyToOne  // Many properties can belong to one location
+    @JoinColumn(name = "location_id", referencedColumnName = "id")
+    private Location location;  // Many-to-one relationship with Location
+
     @Column(name = "date_created")
     private LocalDateTime dateCreated;
 

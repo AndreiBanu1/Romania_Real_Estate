@@ -29,8 +29,10 @@ CREATE TABLE properties (
     floor TEXT,
     short_description TEXT,
     agency_id INT,
+    location_id INT,  -- New column for location
     date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT unique_slug UNIQUE (slug)
+    CONSTRAINT unique_slug UNIQUE (slug),
+    CONSTRAINT fk_location FOREIGN KEY (location_id) REFERENCES locations(id) ON DELETE SET NULL
 );
 
 CREATE TABLE property_images (
